@@ -1,0 +1,33 @@
+name: Update Fund Data
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Täglich um 00:00 UTC
+  workflow_dispatch:  # Manuelles Starten möglich
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository klonen
+        uses: actions/checkout@v3
+
+      - name: Python installieren
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Abhängigkeiten installieren
+        run: pip install yfinance
+
+      - name: Update JSON-Daten
+        run: python update_data.py
+
+      - name: Änderungen committen
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add fund_data.json
+          git commit -m "📈 Automatische Aktualisierung der Fonds-Daten"
+          git push
